@@ -14,8 +14,8 @@ pipeline {
                 script {
                     docker.image('my-python-app:latest').inside {
                         sh 'https://github.com/FTON852/jenkins_lab2'
-                        sh 'pip install pyinstaller'
-                        sh 'pyinstaller --onefile main.py'
+                        sh 'sudo pip install pyinstaller'
+                        sh 'sudo pyinstaller --onefile main.py'
                     }
                 }
             }
