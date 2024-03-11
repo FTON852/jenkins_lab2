@@ -1,26 +1,24 @@
 pipeline {
-    agent {
-        docker {
-            image 'python:3.9.0' // Docker-образ для сборки проекта
-            args '-v /root/.cache:/root/.cache' // Монтирование кеша pip
-        }
-    }
+    agent any
+
     stages {
-        stage('Checkout') {
-            steps {
-                git 'https://github.com/FTON852/jenkins_lab2' // Клонирование репозитория с проектом
+        stage('Build in Docker') {
+            agent {
+                docker {
+                    image 'mcr.microsoft.com/dotnet/sdk:6.0'
+                    args '-v $PWD:/app'
+                }
             }
-        }
-        stage('Create Executable') {
             steps {
-                sh 'sudo pip install pyinstaller' // Установка pyinstaller
-                sh 'sudo pyinstaller --onefile main.py' // Создание исполняемого .exe файла
+                dir('/app') {
+                    sh 'dotnet build -c Release'
+                }
             }
         }
     }
     post {
         success {
-            archiveArtifacts artifacts: 'dist/main.exe', fingerprint: true // Архивирование и сохранение исполняемого .exe файла как артефакта
+            archiveArtifacts artifacts: 'bin/Release/*/', fingerprint: true
         }
     }
 }
