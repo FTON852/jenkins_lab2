@@ -1,0 +1,26 @@
+pipeline {
+    agent {
+        docker {
+            image 'python:3.12' // Docker-образ для сборки проекта
+            args '-v /root/.cache:/root/.cache' // Монтирование кеша pip
+        }
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/FTON852/jenkins_lab2' // Клонирование репозитория с проектом
+            }
+        }
+        stage('Create Executable') {
+            steps {
+                sh 'pip install pyinstaller' // Установка pyinstaller
+                sh 'pyinstaller --onefile main.py' // Создание исполняемого .exe файла
+            }
+        }
+    }
+    post {
+        success {
+            archiveArtifacts artifacts: 'dist/main.exe', fingerprint: true // Архивирование и сохранение исполняемого .exe файла как артефакта
+        }
+    }
+}
