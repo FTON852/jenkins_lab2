@@ -1,29 +1,26 @@
 pipeline {
-    agent any
-
+    agent {
+        docker {
+            image 'python:3.12' // Docker-образ для сборки проекта
+            args '-v /root/.cache:/root/.cache' // Монтирование кеша pip
+        }
+    }
     stages {
-        stage('Build Docker Image') {
+        stage('Checkout') {
             steps {
-                script {
-                    docker.build('python:latest', '-f Dockerfile .')
-                }
+                git 'https://github.com/FTON852/jenkins_lab2' // Клонирование репозитория с проектом
             }
         }
-        stage('Run Python Script') {
+        stage('Create Executable') {
             steps {
-                script {
-                    docker.image('my-python-app:latest').inside {
-                        sh 'https://github.com/FTON852/jenkins_lab2'
-                        sh 'sudo pip install pyinstaller'
-                        sh 'sudo pyinstaller --onefile main.py'
-                    }
-                }
+                sh 'sudo pip install pyinstaller' // Установка pyinstaller
+                sh 'sudo pyinstaller --onefile main.py' // Создание исполняемого .exe файла
             }
         }
     }
     post {
         success {
-            archiveArtifacts artifacts: 'dist/main.exe', fingerprint: true
+            archiveArtifacts artifacts: 'dist/main.exe', fingerprint: true // Архивирование и сохранение исполняемого .exe файла как артефакта
         }
     }
 }
