@@ -1,7 +1,7 @@
 pipeline {
     agent {
         docker {
-            image 'python:lates' // Docker-образ для сборки проекта
+            image 'python:latest' // Docker-образ для сборки проекта
             args '-v /root/.cache:/root/.cache' // Монтирование кеша pip
         }
     }
